@@ -22,15 +22,29 @@ impl Inventory {
     }
 
     fn add_product(&mut self, product: Product) {
-        self.products.insert(product.id, product);
+        if self.products.contains_key(&product.id) {
+            println!("Product with ID {} already exists", product.id);
+        } else {
+            self.products.insert(product.id, product);
+            println!("Product Added Successfully");
+        }
     }
 
     fn edit_product(&mut self, id: u32, new_product: Product) {
-        self.products.insert(id, new_product);
+        if self.products.contains_key(&id) {
+            self.products.insert(id, new_product);
+            println!("Product Edited Successfully");
+        } else {
+            println!("Product with ID {} does not exist", id);
+        }
     }
 
     fn delete_product(&mut self, id: u32) {
-        self.products.remove(&id);
+        if self.products.remove(&id).is_some() {
+            println!("Product Deleted Successfully");
+        } else {
+            println!("Product with ID {} does not exist", id);
+        }
     }
 
     fn list_products(&self) {
@@ -50,6 +64,31 @@ fn read_input<T: FromStr>() -> T {
     }
 }
 
+fn get_product_details() -> Product {
+    println!("Enter Product ID: ");
+    let id: u32 = read_input();
+
+    println!("Enter Product Name: ");
+    let name: String = read_input();
+
+    println!("Enter Product Description: ");
+    let description: String = read_input();
+
+    println!("Enter Product Price: ");
+    let price: f32 = read_input();
+
+    println!("Enter Product Quantity: ");
+    let quantity: i32 = read_input();
+
+    Product {
+        id,
+        name,
+        description,
+        price,
+        quantity,
+    }
+}
+
 fn main() {
     let mut inventory = Inventory::new();
 
@@ -66,68 +105,17 @@ fn main() {
 
         match choice.trim() {
             "1" => {
-                println!("Enter Product ID: ");
-                let id: u32 = read_input();
-
-                println!("Enter Product Name: ");
-                let name: String = read_input();
-
-                println!("Enter Product Description: ");
-                let description: String = read_input();
-
-                println!("Enter Product Price: ");
-                let price: f32 = read_input();
-
-                println!("Enter Product Quantity: ");
-                let quantity: i32 = read_input();
-
-                let product = Product {
-                    id,
-                    name,
-                    description,
-                    price,
-                    quantity,                    
-                };
-
+                let product = get_product_details();
                 inventory.add_product(product);
-
-                println!("Product Added Successfully");
             }
             "2" => {
-                println!("Enter Product ID: ");
-                let id: u32 = read_input();
-
-                println!("Enter Product Name: ");
-                let name: String = read_input();
-
-                println!("Enter Product Description: ");
-                let description: String = read_input();
-
-                println!("Enter Product Price: ");
-                let price: f32 = read_input();
-
-                println!("Enter Product Quantity: ");
-                let quantity: i32 = read_input();
-
-                let product = Product {
-                    id,
-                    name,
-                    description,
-                    price,
-                    quantity,                    
-                };
-
-                inventory.edit_product(id, product);
-
-                println!("Product Edited Successfully");
+                let product = get_product_details();
+                inventory.edit_product(product.id, product);
             },
             "3" => {
                 println!("Enter Product ID: ");
                 let id: u32 = read_input();
-
                 inventory.delete_product(id);
-
-                println!("Product Deleted Successfully");
             },
             "4" => {
                 inventory.list_products();
