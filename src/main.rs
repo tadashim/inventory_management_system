@@ -125,3 +125,65 @@ fn main() {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add_product() {
+        let mut inventory = Inventory::new();
+        let product = Product {
+            id: 1,
+            name: "Test Product".to_string(),
+            description: "Test Description".to_string(),
+            price: 10.0,
+            quantity: 100,
+        };
+
+        inventory.add_product(product);
+        assert_eq!(inventory.products.contains_key(&1), true);
+    }
+
+    #[test]
+    fn test_edit_product() {
+        let mut inventory = Inventory::new();
+        let product = Product {
+            id: 1,
+            name: "Test Product".to_string(),
+            description: "Test Description".to_string(),
+            price: 10.0,
+            quantity: 100,
+        };
+
+        let new_product = Product {
+            id: 1,
+            name: "New Test Product".to_string(),
+            description: "New Test Description".to_string(),
+            price: 20.0,
+            quantity: 200,
+        };
+        
+        inventory.add_product(product);
+        inventory.edit_product(1, new_product);
+        assert_eq!(inventory.products.get(&1).unwrap().name, "New Test Product");
+        assert_eq!(inventory.products.get(&1).unwrap().price, 20.0);
+        assert_eq!(inventory.products.get(&1).unwrap().quantity, 200);
+    }
+
+    #[test]
+    fn test_delete_product() {
+        let mut inventory = Inventory::new();
+        let product = Product {
+            id: 1,
+            name: "Test Product".to_string(),
+            description: "Test Description".to_string(),
+            price: 10.0,
+            quantity: 100,
+        };
+
+        inventory.add_product(product);
+        inventory.delete_product(1);
+        assert_eq!(inventory.products.contains_key(&1), false);
+    }
+}
