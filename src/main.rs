@@ -2,6 +2,9 @@ use std::collections::HashMap;
 use std::io;
 use std::str::FromStr;
 
+mod auth;
+use auth::{User, authenticate};
+
 struct Product {
     id: u32,
     name: String,
@@ -90,37 +93,70 @@ fn get_product_details() -> Product {
 }
 
 fn main() {
+    let users = vec![
+        User {
+            user_id: "admin".to_string(),
+            password: "admin".to_string(),
+        },
+    ];
+
     let mut inventory = Inventory::new();
 
     loop {
         println!("Inventory Management System");
-        println!("1. Add Product");
-        println!("2. Edit Product");
-        println!("3. Delete Product");
-        println!("4. List Products");
-        println!("5. Exit");
+        println!("1. Login");
+        println!("2. logout");
 
         let mut choice = String::new();
         io::stdin().read_line(&mut choice).expect("Failed to read line");
 
         match choice.trim() {
             "1" => {
-                let product = get_product_details();
-                inventory.add_product(product);
-            }
-            "2" => {
-                let product = get_product_details();
-                inventory.edit_product(product.id, product);
+                println!("Enter User ID: ");
+                let user_id: String = read_input();
+
+                println!("Enter Password: ");
+                let password: String = read_input();
+
+                match authenticate(&users, &user_id, &password) {
+                    Some(_user) => {
+                        println!("Login Successful");
+                        loop {
+                            println!("1. Add Product");
+                            println!("2. Edit Product");
+                            println!("3. Delete Product");
+                            println!("4. List Products");
+                            println!("5. Exit");
+
+                            let mut choice = String::new();
+                            io::stdin().read_line(&mut choice).expect("Failed to read line");
+
+                            match choice.trim() {
+                                "1" => {
+                                    let product = get_product_details();
+                                    inventory.add_product(product);
+                                }
+                                "2" => {
+                                    let product = get_product_details();
+                                    inventory.edit_product(product.id, product);
+                                },
+                                "3" => {
+                                    println!("Enter Product ID: ");
+                                    let id: u32 = read_input();
+                                    inventory.delete_product(id);
+                                },
+                                "4" => {
+                                    inventory.list_products();
+                                },
+                                "5" => break,
+                                _ => println!("Invalid option, please try again"),
+                            }
+                        }
+                    },
+                    None => println!("Invalid credentials"),
+                }
             },
-            "3" => {
-                println!("Enter Product ID: ");
-                let id: u32 = read_input();
-                inventory.delete_product(id);
-            },
-            "4" => {
-                inventory.list_products();
-            },
-            "5" => break,
+            "2" => break,
             _ => println!("Invalid option, please try again"),
         }
     }
